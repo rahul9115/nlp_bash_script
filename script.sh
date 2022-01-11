@@ -35,10 +35,27 @@ array=()
 read str1; 
 array+=("$str1")
 while read str2; do
+    count=0
     for (( i=0; i<"${#array[@]}"; i++ )); do
         lev=$(levenshtein "$str2" "${array[$i]}");
+        l1=${#str2}
+        l2=${#array[$i]}
+        if [ $l1 == $l2 ] && [ "$lev" == "0" ]; then 
+            count=$((count+1))
+        elif [ $l1 -gt $l2 ]; then
+            val=$((l1/2))
+            if [ "$lev" == "0" ] || [ "$lev" -lt $val ]; then
+                count=$((count+1))
+            fi 
+        elif [ $l2 -gt $l1 ]; then
+            val=$((l2/2))
+            if [ "$lev" == "0" ] || [ "$lev" -lt $val ]; then
+                count=$((count+1))
+            fi 
+        fi
         printf '%s / %s : %s\n' "$str2" "${array[$i]}" "$lev"
     done
+    printf "Count of the string being repeated is %d \n" "$count"
     array+=("$str2")
 done
 
